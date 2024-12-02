@@ -8,10 +8,15 @@
     "allowSyntheticDefaultImports": true,
     "target": "ES2021",
     "sourceMap": true,
-    "outDir": "./dist",
+    "outDir": "./dist",  // This is where the compiled JS will go
     "baseUrl": "./",
     "incremental": true,
     "forceConsistentCasingInFileNames": true,
-    "skipLibCheck": true
-  }
+    "skipLibCheck": true,
+    "paths": {
+      "src/*": ["./src/*"]
+    }
+  },
+  "include": ["src/**/*.ts"],  // Include all TypeScript files in the src directory
+  "exclude": ["node_modules", "dist"]  // Exclude dist and node_modules from compilation
 }
