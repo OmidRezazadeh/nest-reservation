@@ -6,8 +6,8 @@ import {
   CreateDateColumn,
   UpdateDateColumn,
   OneToOne,
-  JoinColumn,
-} from 'typeorm';
+  JoinColumn, ManyToOne
+} from "typeorm";
 
 
 @Entity()
@@ -35,7 +35,6 @@ export class User {
   @UpdateDateColumn()
   updated_at: Date; // Automatically updated on save
 
-  @OneToOne(() => Role, (role) => role.user)
-  @JoinColumn()
+  @ManyToOne(() =>Role,(role)=> role.users,{eager:true})
   role: Role;
 }

@@ -3,7 +3,12 @@ import { User } from './entities/user.entity';
 
 
 export class UserRepository extends Repository<User>{
-store(data: any){
+ async  findByEmail(email: string) {
+        return await this.findOne({
+               where: { email: email },
+        });
+ };
+       store(data: any){
        return this.create(data);
 }
 }

@@ -24,16 +24,21 @@
     "node": ">=16.0.0"
   },
   "dependencies": {
+    "@faker-js/faker": "^9.3.0",
     "@nestjs/common": "^10.4.9",
     "@nestjs/config": "^3.3.0",
     "@nestjs/core": "^10.4.9",
+    "@nestjs/jwt": "^10.2.0",
     "@nestjs/mapped-types": "*",
+    "@nestjs/passport": "^10.0.3",
     "@nestjs/platform-express": "^10.4.4",
     "@nestjs/typeorm": "^10.0.2",
     "bcrypt": "^5.1.1",
     "class-transformer": "^0.5.1",
     "class-validator": "^0.14.1",
     "dotenv": "^16.4.5",
+    "passport": "^0.7.0",
+    "passport-jwt": "^4.0.1",
     "reflect-metadata": "^0.2.1",
     "rxjs": "^7.8.1",
     "typeorm": "^0.3.20"

@@ -6,7 +6,10 @@ import { UsersModule } from './users/users.module';
 import { User } from './users/entities/user.entity';
 import { ProductsModule } from './products/products.module';
 import { RolesModule } from './roles/roles.module';
-import { Role } from './roles/entities/role.entity';
+import { SeederService } from './seeder/seeder.service';
+import { Role } from "src/roles/entities/role.entity";
+import { SeederModule } from './seeder/seeder.module';
+import { AuthModule } from './auth/auth.module';
 
 @Module({
   imports: [
@@ -18,18 +21,16 @@ import { Role } from './roles/entities/role.entity';
       password: '123',
       database: 'reservation',
       entities: [User,Role], // Add all your entities here
-      synchronize: false, // Make sure it's false for migrations
+      synchronize: true, // Don't use in production
       migrations: [__dirname + '/migrations/*{.ts,.js}'],
-
     }),
-
     UsersModule,
-
     ProductsModule,
-
     RolesModule,
+    SeederModule,
+    AuthModule,
   ],
   controllers: [AppController],
-  providers: [AppService],
+  providers: [AppService, SeederService],
 })
 export class AppModule {}
