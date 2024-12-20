@@ -3,10 +3,11 @@ import { AuthService } from './auth.service';
 import { TypeOrmModule } from "@nestjs/typeorm";
 import { User } from "src/users/entities/user.entity";
 import { PassportModule } from "@nestjs/passport";
-import { JwtModule } from '@nestjs/jwt';
+import { JwtModule, JwtService } from '@nestjs/jwt';
 import * as process from "node:process";
 import { UsersService } from "src/users/users.service";
 import { AuthController } from './auth.controller';
+import { UserRepository } from 'src/users/user.repository';
 @Module({
   imports:[
     TypeOrmModule.forFeature([User]),
@@ -16,7 +17,7 @@ import { AuthController } from './auth.controller';
       signOptions: { expiresIn: process.env.JWT_EXPIRES_IN },
     })
   ],
-  providers: [AuthService,UsersService],
+  providers: [AuthService,UsersService,UserRepository,JwtService],
   controllers: [AuthController],
 
 })
