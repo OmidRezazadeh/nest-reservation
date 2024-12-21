@@ -11,9 +11,12 @@ import { Role } from "src/roles/entities/role.entity";
 import { SeederModule } from './seeder/seeder.module';
 import { AuthModule } from './auth/auth.module';
 import { LoggerMiddleware } from './logger/logger.middleware';
-
+import { ConfigModule } from '@nestjs/config';
 @Module({
   imports: [
+    ConfigModule.forRoot({
+      isGlobal: true, // Makes the configuration available globally
+    }),
     TypeOrmModule.forRoot({
       type: 'postgres',
       host: 'localhost',

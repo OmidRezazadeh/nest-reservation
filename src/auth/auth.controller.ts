@@ -1,4 +1,4 @@
-import { Body, Controller, HttpException, Post } from '@nestjs/common';
+import { Body, Controller, Get, HttpException, Post, UseGuards } from '@nestjs/common';
 import { createUserDto } from 'src/users/dto/create-user.dto';
 import { AuthService } from 'src/auth/auth.service';
 import { UsersService } from '../users/users.service';
@@ -6,13 +6,14 @@ import { UsersService } from '../users/users.service';
 import { LoginDto } from './dto/Login.dto';
 import * as bcrypt from 'bcrypt';
 import { JwtService } from '@nestjs/jwt';
+import { JwtAuthGuard } from 'src/jwt-auth/jwt-auth.guard';
 
 @Controller('auth')
 export class AuthController {
   constructor(
     private usersService: UsersService,
     private readonly authService: AuthService,
-    private readonly jwtService: JwtService,
+    private  jwtService: JwtService,
   ) {}
 
   @Post('register')
@@ -40,9 +41,23 @@ export class AuthController {
      if(!isPasswordMath){
       throw new HttpException(`Password is incorrect`,400);
      }
-     return user;
+
+     const accessToken =this.jwtService.sign({
+      sub:user.id,
+      email:user.email
+     })
+     return {
+      accessToken:accessToken,
+
+     }
 
 
+  }
+
+  @UseGuards(JwtAuthGuard)
+  @Get('test')
+  getProfile() {
+     return 'test';
   }
 }
 
