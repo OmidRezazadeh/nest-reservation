@@ -1,4 +1,4 @@
-import { Body, Controller, Get, HttpException, Post, UseGuards } from '@nestjs/common';
+import { Body, Controller, Get, HttpException, Post,Request, UseGuards } from '@nestjs/common';
 import { createUserDto } from 'src/users/dto/create-user.dto';
 import { AuthService } from 'src/auth/auth.service';
 import { UsersService } from '../users/users.service';
@@ -56,7 +56,9 @@ export class AuthController {
 
   @UseGuards(JwtAuthGuard)
   @Get('test')
-  getProfile() {
+  getProfile(@Request() req,) {
+    // const user= req.user;
+    // console.log(user.email)
      return 'test';
   }
 }
