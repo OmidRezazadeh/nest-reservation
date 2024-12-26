@@ -4,7 +4,7 @@ import {
   Entity,
   Column,
   PrimaryGeneratedColumn,
-  JoinColumn, OneToMany
+   OneToMany
 } from "typeorm";
 
   @Entity()

@@ -3,6 +3,7 @@ import { Role } from '../roles/entities/role.entity';
 import {config} from 'dotenv';
 import { config as dotenvConfig } from 'dotenv';
 import { DataSource } from "typeorm";
+import { Product } from 'src/products/entities/product.entity';
 dotenvConfig({ path: '.env' });
 config();
 
@@ -13,6 +14,6 @@ export const AppDataSource = new DataSource({
   username: 'postgres',
   password: '123',
   database: 'reservation',
-  entities: [User,Role],
+  entities: [User,Role,Product],
   synchronize: true,
 });

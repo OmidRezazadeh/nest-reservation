@@ -12,6 +12,7 @@ import { SeederModule } from './seeder/seeder.module';
 import { AuthModule } from './auth/auth.module';
 import { LoggerMiddleware } from './logger/logger.middleware';
 import { ConfigModule } from '@nestjs/config';
+import { Product } from './products/entities/product.entity';
 @Module({
   imports: [
     ConfigModule.forRoot({
@@ -24,7 +25,7 @@ import { ConfigModule } from '@nestjs/config';
       username: 'postgres',
       password: '123',
       database: 'reservation',
-      entities: [User,Role], // Add all your entities here
+      entities: [User,Role,Product], // Add all your entities here
       synchronize: true, // Don't use in production
       migrations: [__dirname + '/migrations/*{.ts,.js}'],
     }),

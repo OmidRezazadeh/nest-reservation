@@ -1,3 +1,4 @@
+import { Product } from 'src/products/entities/product.entity';
 import { Role } from '../../roles/entities/role.entity';
 import {
   Entity,
@@ -5,8 +6,8 @@ import {
   PrimaryGeneratedColumn,
   CreateDateColumn,
   UpdateDateColumn,
-  OneToOne,
-  JoinColumn, ManyToOne
+
+  JoinColumn, ManyToOne,OneToMany
 } from "typeorm";
 
 
@@ -37,4 +38,7 @@ export class User {
 
   @ManyToOne(() =>Role,(role)=> role.users,{eager:true})
   role: Role;
+
+  @OneToMany(() => Product, (product) => product.user, { cascade: true })
+  products: Product[];
 }
