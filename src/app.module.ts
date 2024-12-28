@@ -19,12 +19,12 @@ import { Product } from './products/entities/product.entity';
       isGlobal: true, // Makes the configuration available globally
     }),
     TypeOrmModule.forRoot({
-      type: 'postgres',
-      host: 'localhost',
-      port: 5432,
-      username: 'postgres',
-      password: '123',
-      database: 'reservation',
+      type: process.env.DB_TYPE as any,
+      host: process.env.DB_HOST,
+      port: parseInt(process.env.DB_PORT),
+      username: process.env.DB_USERNAME,
+      password: process.env.DB_PASSWORD,
+      database: process.env.DB_NAME,
       entities: [User,Role,Product], // Add all your entities here
       synchronize: true, // Don't use in production
       migrations: [__dirname + '/migrations/*{.ts,.js}'],
