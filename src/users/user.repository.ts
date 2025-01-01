@@ -20,4 +20,9 @@ export class UserRepository {
         const user = this.repository.create(data);
         return this.repository.save(user);
     }
+     async findOne(id:number){
+         return await this.repository.findOne({
+            where:{id:id}
+     })
+     }
 }

@@ -44,7 +44,8 @@ export class AuthController {
 
      const accessToken =this.jwtService.sign({
       sub:user.id,
-      email:user.email
+      email:user.email,
+      role_name:user.role_name
      })
      return {
       accessToken:accessToken,

@@ -2,6 +2,7 @@ import { Injectable } from '@nestjs/common';
 import { UserRepository } from './user.repository';
 import * as bcrypt from 'bcrypt';
 import { RoleEnum } from 'src/roles/enums/roles.enums';
+import { th } from '@faker-js/faker/.';
 
 @Injectable()
 export class UsersService {
@@ -24,5 +25,9 @@ export class UsersService {
         };
         
         return this.usersRepository.store(userData);
+    }
+    async findOne(id: number){
+         return this.usersRepository.findOne(id)
+
     }
 }
