@@ -1,13 +1,12 @@
 import { Product } from 'src/products/entities/product.entity';
-import { Role } from '../../roles/entities/role.entity';
+import { RoleEnum } from 'src/roles/enums/roles.enums';
 import {
   Entity,
   Column,
   PrimaryGeneratedColumn,
   CreateDateColumn,
   UpdateDateColumn,
-
-  JoinColumn, ManyToOne,OneToMany
+  OneToMany
 } from "typeorm";
 
 
@@ -27,18 +26,20 @@ export class User {
   @Column({ default: 'active' })
   status: string; // 'active', 'inactive', etc.
   
-  @Column({ nullable: true }) // Explicit foreign key
-  roleId: number;
 
+  @Column({ nullable: true, default: RoleEnum.USER }) 
+  role_name: string[];
+
+  @OneToMany(() => Product, (product) => product.user, { cascade: true })
+  products: Product[];
+  
   @CreateDateColumn()
   created_at: Date; // Automatically set when created
 
   @UpdateDateColumn()
   updated_at: Date; // Automatically updated on save
 
-  @ManyToOne(() =>Role,(role)=> role.users,{eager:true})
-  role: Role;
 
-  @OneToMany(() => Product, (product) => product.user, { cascade: true })
-  products: Product[];
+
+
 }
