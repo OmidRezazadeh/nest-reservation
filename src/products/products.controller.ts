@@ -11,6 +11,7 @@ export class ProductsController {
 
   @Post('create')
   @UseGuards(JwtAuthGuard)
+  @UseGuards('')
   async create(@Request() request, @Body() createProductDto: CreateProductDto) {
     const userId = request.user.id; // Extract user ID from the request
     return this.productsService.create(createProductDto, userId);

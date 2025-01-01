@@ -27,12 +27,12 @@ export class User {
   status: string; // 'active', 'inactive', etc.
   
 
-  @Column({ nullable: true, default: RoleEnum.USER }) 
-  role_name: string[];
+  @Column({ nullable: true, default:RoleEnum.USER })
+  role_name: string;
 
   @OneToMany(() => Product, (product) => product.user, { cascade: true })
   products: Product[];
-  
+
   @CreateDateColumn()
   created_at: Date; // Automatically set when created
 
