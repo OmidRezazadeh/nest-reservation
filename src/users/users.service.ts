@@ -1,7 +1,7 @@
 import { Injectable } from '@nestjs/common';
 import { UserRepository } from './user.repository';
 import * as bcrypt from 'bcrypt';
-import { UserRole } from 'src/roles/enums/roles.enums';
+import { RoleEnum } from 'src/roles/enums/roles.enums';
 
 @Injectable()
 export class UsersService {
@@ -19,7 +19,7 @@ export class UsersService {
         const userData = {
             name: data.name,
             password: hashPassword,
-            roleId: UserRole.USER,
+            roleId: RoleEnum.USER,
             email: data.email
         };
         
