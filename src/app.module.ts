@@ -9,6 +9,8 @@ import { AuthModule } from './auth/auth.module';
 import { LoggerMiddleware } from './logger/logger.middleware';
 import { ConfigModule } from '@nestjs/config';
 import { Product } from './products/entities/product.entity';
+import { APP_INTERCEPTOR } from '@nestjs/core';
+import { LoggingInterceptor } from './interceptors/logging.interceptor';
 @Module({
   imports: [
     ConfigModule.forRoot({
@@ -30,10 +32,16 @@ import { Product } from './products/entities/product.entity';
     AuthModule,
   ],
   controllers: [AppController],
-  providers: [AppService],
+  providers: [AppService,
+    {
+      provide:APP_INTERCEPTOR,
+      useClass:LoggingInterceptor
+    }
+  ],
 })
 export class AppModule implements NestModule {
   configure(consumer: MiddlewareConsumer) {
+
   consumer.apply(LoggerMiddleware).forRoutes('*')    
   }
 }
