@@ -11,6 +11,7 @@ import { ConfigModule } from '@nestjs/config';
 import { Product } from './products/entities/product.entity';
 import { APP_INTERCEPTOR } from '@nestjs/core';
 import { LoggingInterceptor } from './interceptors/logging.interceptor';
+import { UserSubscriber } from './users/subscribers/user-subscriber';
 @Module({
   imports: [
     ConfigModule.forRoot({
@@ -24,6 +25,7 @@ import { LoggingInterceptor } from './interceptors/logging.interceptor';
       password: process.env.DB_PASSWORD,
       database: process.env.DB_NAME,
       entities: [User,Product], // Add all your entities here
+      subscribers: [UserSubscriber], // Register the subscriber here
       synchronize: true, // Don't use in production
       migrations: [__dirname + '/migrations/*{.ts,.js}'],
     }),
