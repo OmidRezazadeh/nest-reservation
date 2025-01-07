@@ -1,4 +1,16 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete, Request, UseGuards, Put } from '@nestjs/common';
+import {
+  Controller,
+  Get,
+  Post,
+  Body,
+  Patch,
+  Param,
+  Delete,
+  Request,
+  UseGuards,
+  Put,
+  InternalServerErrorException,
+} from '@nestjs/common';
 import { ProductsService } from './products.service';
 import { CreateProductDto } from './dto/create-product.dto';
 import { UpdateProductDto } from './dto/update-product.dto';
@@ -6,21 +18,47 @@ import { JwtAuthGuard } from 'src/jwt-auth/jwt-auth.guard';
 import { RolesGuard } from 'src/roles/roles.guard';
 import { Roles } from 'src/roles/roles.decorator';
 import { RoleEnum } from 'src/roles/enums/roles.enums';
-
+import { DataSource, QueryRunner } from 'typeorm';
 
 @Controller('products')
 export class ProductsController {
-  constructor(private readonly productsService: ProductsService) {}
-  @Roles(RoleEnum.ADMIN)
-  @UseGuards(JwtAuthGuard,RolesGuard)
+  constructor(
+    private readonly productsService: ProductsService,
+    private readonly dataSource: DataSource,
+  ) {}
+  @Roles(RoleEnum.USER)
+  @UseGuards(JwtAuthGuard, RolesGuard)
   @Post('create')
   async create(@Request() request, @Body() createProductDto: CreateProductDto) {
-    const userId = request.user.id; // Extract user ID from the request
-    return this.productsService.create(createProductDto, userId);
+    const queryRunner: QueryRunner = this.dataSource.createQueryRunner();
+    await queryRunner.connect();
+    await queryRunner.startTransaction();
+    try {
+      const userId = request.user.id;
+      const product = this.productsService.create(
+        createProductDto,
+        userId,
+        queryRunner,
+      );
+
+      const productId = (await product).id;
+      await this.productsService.updateTitle(productId, queryRunner);
+      await queryRunner.commitTransaction();
+      return product;
+    } catch (error) {
+      // Rollback the transaction on error
+      await queryRunner.rollbackTransaction();
+      throw new InternalServerErrorException(
+        'Transaction failed, changes rolled back.',
+      );
+    } finally {
+      // Release the queryRunner
+      await queryRunner.release();
+    }
   }
 
   @Get('list')
-   async findAll() {
+  async findAll() {
     return await this.productsService.findAll();
   }
 
@@ -32,8 +70,6 @@ export class ProductsController {
   @Put(':id')
   update(@Param('id') id: number, @Body() updateProductDto: UpdateProductDto) {
     return this.productsService.update(id, updateProductDto);
-
-
   }
 
   @Delete(':id')

@@ -3,7 +3,7 @@ import { CreateProductDto } from './dto/create-product.dto';
 import { UpdateProductDto } from './dto/update-product.dto';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Product } from './entities/product.entity';
-import { Repository } from 'typeorm';
+import { Repository, QueryRunner } from 'typeorm';
 import { User } from 'src/users/entities/user.entity';
 
 @Injectable()
@@ -14,14 +14,19 @@ export class ProductsService {
     @InjectRepository(User)
     private userRepository: Repository<User>,
   ) {}
+  async updateTitle(productId:number,queryRunner:QueryRunner){
+    await queryRunner.manager.update(Product,productId,{
+      title:"ok"
+    });
 
-  async create(createProductDto: CreateProductDto, userId: number) {
+  }
+  async create(createProductDto: CreateProductDto, userId: number , queryRunner: QueryRunner) {
     const user = await this.userRepository.findOne({ where: { id: userId } });
     if (!user) {
       throw new Error('User not found');
     }
 
-    const product = this.productRepository.save({
+    const product = queryRunner.manager.save(Product,{
       ...createProductDto,
       user,
     });
