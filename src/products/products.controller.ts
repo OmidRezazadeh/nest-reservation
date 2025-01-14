@@ -3,14 +3,12 @@ import {
   Get,
   Post,
   Body,
-  Patch,
   Param,
   Delete,
   Request,
   UseGuards,
   Put,
-  InternalServerErrorException,
-} from '@nestjs/common';
+  InternalServerErrorException,Inject} from '@nestjs/common';
 import { ProductsService } from './products.service';
 import { CreateProductDto } from './dto/create-product.dto';
 import { UpdateProductDto } from './dto/update-product.dto';
@@ -19,12 +17,16 @@ import { RolesGuard } from 'src/roles/roles.guard';
 import { Roles } from 'src/roles/roles.decorator';
 import { RoleEnum } from 'src/roles/enums/roles.enums';
 import { DataSource, QueryRunner } from 'typeorm';
-
+import { CACHE_MANAGER } from '@nestjs/cache-manager';
+import { Cache } from 'cache-manager';
 @Controller('products')
 export class ProductsController {
   constructor(
     private readonly productsService: ProductsService,
     private readonly dataSource: DataSource,
+
+    @Inject(CACHE_MANAGER) private cacheManager: Cache
+   
   ) {}
   @Roles(RoleEnum.USER)
   @UseGuards(JwtAuthGuard, RolesGuard)
@@ -40,6 +42,7 @@ export class ProductsController {
         userId,
         queryRunner,
       );
+
 
       const productId = (await product).id;
       await this.productsService.updateTitle(productId, queryRunner);
@@ -59,7 +62,22 @@ export class ProductsController {
 
   @Get('list')
   async findAll() {
-    return await this.productsService.findAll();
+    const cacheKey = 'all-products';
+    const cachedData = await this.cacheManager.get('all-products');
+  
+  
+    if (cachedData) {
+      console.log('Returning data from cache:', cachedData);
+      return { source: 'cache', value: cachedData };
+    }
+  
+    console.log('Fetching data from the database');
+    const products = await this.productsService.findAll();
+  
+    await this.cacheManager.set(cacheKey, products);
+    console.log('Data cached:', products);
+  
+    return products;
   }
 
   @Get(':id')

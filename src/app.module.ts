@@ -1,49 +1,35 @@
-import { MiddlewareConsumer, Module, NestModule } from '@nestjs/common';
-import { AppController } from './app.controller';
-import { AppService } from './app.service';
+import { Module } from '@nestjs/common';
+import { ConfigModule } from '@nestjs/config';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { UsersModule } from './users/users.module';
-import { User } from './users/entities/user.entity';
 import { ProductsModule } from './products/products.module';
 import { AuthModule } from './auth/auth.module';
-import { LoggerMiddleware } from './logger/logger.middleware';
-import { ConfigModule } from '@nestjs/config';
+import { CacheModule } from '@nestjs/cache-manager';
 import { Product } from './products/entities/product.entity';
-import { APP_INTERCEPTOR } from '@nestjs/core';
-import { LoggingInterceptor } from './interceptors/logging.interceptor';
-import { UserSubscriber } from './users/subscribers/user-subscriber';
+import { User } from './users/entities/user.entity';
+
 @Module({
   imports: [
-    ConfigModule.forRoot({
-      isGlobal: true, // Makes the configuration available globally
-    }),
+    CacheModule.register({
+      isGlobal: true,
+      ttl: 100, // seconds
+      max: 60, // maximum number of items in cache
+}),
+    ConfigModule.forRoot(),
     TypeOrmModule.forRoot({
-      type: process.env.DB_TYPE as any,
+      type: 'postgres',
       host: process.env.DB_HOST,
       port: parseInt(process.env.DB_PORT),
       username: process.env.DB_USERNAME,
       password: process.env.DB_PASSWORD,
       database: process.env.DB_NAME,
-      entities: [User,Product], // Add all your entities here
-      subscribers: [UserSubscriber], // Register the subscriber here
-      synchronize: true, // Don't use in production
-      migrations: [__dirname + '/migrations/*{.ts,.js}'],
+      entities: [User, Product],
+      synchronize: true,
     }),
+
     UsersModule,
     ProductsModule,
     AuthModule,
   ],
-  controllers: [AppController],
-  providers: [AppService,
-    {
-      provide:APP_INTERCEPTOR,
-      useClass:LoggingInterceptor
-    }
-  ],
 })
-export class AppModule implements NestModule {
-  configure(consumer: MiddlewareConsumer) {
-
-  consumer.apply(LoggerMiddleware).forRoutes('*')    
-  }
-}
+export class AppModule {}
