@@ -19,6 +19,8 @@ import { RoleEnum } from 'src/roles/enums/roles.enums';
 import { DataSource, QueryRunner } from 'typeorm';
 import { CACHE_MANAGER } from '@nestjs/cache-manager';
 import { Cache } from 'cache-manager';
+import { plainToInstance } from 'class-transformer';
+import { ProductDto } from './dto/ProductDto';
 @Controller('products')
 export class ProductsController {
   constructor(
@@ -77,7 +79,7 @@ export class ProductsController {
     await this.cacheManager.set(cacheKey, products);
     console.log('Data cached:', products);
   
-    return products;
+    return plainToInstance (ProductDto,products);
   }
 
   @Get(':id')
