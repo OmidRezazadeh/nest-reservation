@@ -8,7 +8,10 @@ import {
   Request,
   UseGuards,
   Put,
-  InternalServerErrorException,Inject} from '@nestjs/common';
+  InternalServerErrorException,
+  Inject,
+  Query,
+} from '@nestjs/common';
 import { ProductsService } from './products.service';
 import { CreateProductDto } from './dto/create-product.dto';
 import { UpdateProductDto } from './dto/update-product.dto';
@@ -17,18 +20,16 @@ import { RolesGuard } from 'src/roles/roles.guard';
 import { Roles } from 'src/roles/roles.decorator';
 import { RoleEnum } from 'src/roles/enums/roles.enums';
 import { DataSource, QueryRunner } from 'typeorm';
-import { CACHE_MANAGER } from '@nestjs/cache-manager';
-import { Cache } from 'cache-manager';
+import { RedisService } from '../redis/redis.service';
 import { plainToInstance } from 'class-transformer';
 import { ProductDto } from './dto/ProductDto';
+import {  RedisKeys } from 'src/redis/redis-keys.constants';
 @Controller('products')
 export class ProductsController {
   constructor(
     private readonly productsService: ProductsService,
     private readonly dataSource: DataSource,
-
-    @Inject(CACHE_MANAGER) private cacheManager: Cache
-   
+    private readonly redisService: RedisService,
   ) {}
   @Roles(RoleEnum.USER)
   @UseGuards(JwtAuthGuard, RolesGuard)
@@ -45,10 +46,14 @@ export class ProductsController {
         queryRunner,
       );
 
-
       const productId = (await product).id;
       await this.productsService.updateTitle(productId, queryRunner);
+
       await queryRunner.commitTransaction();
+
+          // Cache the newly created product
+          const productCacheKey = RedisKeys.PRODUCTS_LIST;
+          await this.redisService.deleteValue(productCacheKey);
       return product;
     } catch (error) {
       // Rollback the transaction on error
@@ -63,37 +68,44 @@ export class ProductsController {
   }
 
   @Get('list')
-  async findAll() {
-    const cacheKey = 'all-products';
-    const cachedData = await this.cacheManager.get('all-products');
-  
-  
-    if (cachedData) {
-      console.log('Returning data from cache:', cachedData);
-      return { source: 'cache', value: cachedData };
+  async findAll(
+    @Query('page') page: string = '1', // Default to 1 if not provided
+    @Query('limit') limit: string = '10', // Default to 10 if not provided
+  ) {
+ 
+  const productCacheList= RedisKeys.PRODUCTS_LIST
+    const cachedProducts = await this.redisService.getValue(productCacheList);
+    if (cachedProducts) {
+      console.log('Returning products from Redis cache');
+      return JSON.parse(cachedProducts);
     }
-  
-    console.log('Fetching data from the database');
-    const products = await this.productsService.findAll();
-  
-    await this.cacheManager.set(cacheKey, products);
-    console.log('Data cached:', products);
-  
-    return plainToInstance (ProductDto,products);
+    const pageNumber = parseInt(page); // Convert to number
+    const limitNumber = parseInt(limit); // Convert to number
+
+    const products = await this.productsService.findAll(pageNumber, limitNumber);
+    await this.redisService.setValue(productCacheList, JSON.stringify(products));
+    return products;
   }
 
+  @Delete(':id')
+  async remove(@Param('id') id: number) {
+    const cacheKey = RedisKeys.PRODUCT_BY_ID(id);
+    await this.redisService.deleteValue(cacheKey);
+    const listCacheKey = RedisKeys.PRODUCTS_LIST;
+    await this.redisService.deleteValue(listCacheKey);
+    return this.productsService.remove(id);
+  }
   @Get(':id')
   findOne(@Param('id') id: number) {
     return this.productsService.findOne(id);
   }
 
   @Put(':id')
-  update(@Param('id') id: number, @Body() updateProductDto: UpdateProductDto) {
-    return this.productsService.update(id, updateProductDto);
-  }
+  async update(@Param('id') id: number, @Body() updateProductDto: UpdateProductDto) {
+    
+     await this.productsService.update(id, updateProductDto);
+     const listCacheKey = RedisKeys.PRODUCTS_LIST;
+    await this.redisService.deleteValue(listCacheKey);
 
-  @Delete(':id')
-  remove(@Param('id') id: number) {
-    return this.productsService.remove(id);
   }
 }

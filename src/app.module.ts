@@ -4,18 +4,15 @@ import { TypeOrmModule } from '@nestjs/typeorm';
 import { UsersModule } from './users/users.module';
 import { ProductsModule } from './products/products.module';
 import { AuthModule } from './auth/auth.module';
-import { CacheModule } from '@nestjs/cache-manager';
 import { Product } from './products/entities/product.entity';
 import { User } from './users/entities/user.entity';
 
+import { RedisModule } from './redis/redis.module';
+
 @Module({
   imports: [
-    CacheModule.register({
-      isGlobal: true,
-      ttl: 100, // seconds
-      max: 60, // maximum number of items in cache
-}),
-    ConfigModule.forRoot(),
+    RedisModule,
+    ConfigModule.forRoot({isGlobal: true}),
     TypeOrmModule.forRoot({
       type: 'postgres',
       host: process.env.DB_HOST,
@@ -30,6 +27,8 @@ import { User } from './users/entities/user.entity';
     UsersModule,
     ProductsModule,
     AuthModule,
+    
+    RedisModule,
   ],
 })
 export class AppModule {}

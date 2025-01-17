@@ -33,11 +33,24 @@ export class ProductsService {
     return product;
   }
 
-  findAll() {
-    return this.productRepository.find({
-      relations:['user']
+   async findAll(page: number, limit: number) {
+    console.log(page,limit);
+    const skip = (page - 1) * limit;
+
+   const [data,total]= await this.productRepository.findAndCount({
+      relations:['user'],
+      take: limit,
+      skip: skip,
     });
+
+    return {
+      data,
+      total,
+      page,
+      lastPage: Math.ceil(total / limit),
+    };
   }
+
 
   findOne(id: number) {
     return this.productRepository.findOne({
@@ -47,6 +60,7 @@ export class ProductsService {
   }
 
   update(id: number, updateProductDto: UpdateProductDto) {
+    console.log()
     return this.productRepository.update({id},{...updateProductDto}) ;
   }
 

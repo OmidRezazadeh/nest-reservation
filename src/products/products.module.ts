@@ -6,12 +6,15 @@ import { Product } from './entities/product.entity';
 import { User } from 'src/users/entities/user.entity';
 import { UsersModule } from 'src/users/users.module';
 
+import { RedisService } from 'src/redis/redis.service';
+
 @Module({
   imports: [
+
     TypeOrmModule.forFeature([Product, User]),
     UsersModule,
   ],
   controllers: [ProductsController],
-  providers: [ProductsService],
+  providers: [ProductsService,RedisService],
 })
 export class ProductsModule {}
