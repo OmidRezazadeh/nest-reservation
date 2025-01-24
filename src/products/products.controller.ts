@@ -11,6 +11,7 @@ import {
   InternalServerErrorException,
   Inject,
   Query,
+  forwardRef,
 } from '@nestjs/common';
 import { ProductsService } from './products.service';
 import { CreateProductDto } from './dto/create-product.dto';
@@ -21,16 +22,30 @@ import { Roles } from 'src/roles/roles.decorator';
 import { RoleEnum } from 'src/roles/enums/roles.enums';
 import { DataSource, QueryRunner } from 'typeorm';
 import { RedisService } from '../redis/redis.service';
-import { plainToInstance } from 'class-transformer';
-import { ProductDto } from './dto/ProductDto';
 import {  RedisKeys } from 'src/redis/redis-keys.constants';
+import { TaskService } from '../task.service';
 @Controller('products')
 export class ProductsController {
   constructor(
     private readonly productsService: ProductsService,
     private readonly dataSource: DataSource,
     private readonly redisService: RedisService,
-  ) {}
+    @Inject(forwardRef(() => TaskService))
+    private readonly taskService: TaskService
+  ) {
+
+    }
+
+
+  @Post('add')
+   add(
+    @Body() body: { name: string; cronTime: string; message: string }
+  ){
+     const { name, cronTime, message } = body;
+      this.taskService.addCronJob(name, cronTime)
+      console.log(`Dynamic Cron job "${name}" executed: ${message}`);
+    return { message: `Cron job "${name}" added with schedule "${cronTime}"` };
+  }
   @Roles(RoleEnum.USER)
   @UseGuards(JwtAuthGuard, RolesGuard)
   @Post('create')
@@ -108,4 +123,5 @@ export class ProductsController {
     await this.redisService.deleteValue(listCacheKey);
 
   }
+
 }
