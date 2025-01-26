@@ -46,6 +46,20 @@ export class ProductsController {
       console.log(`Dynamic Cron job "${name}" executed: ${message}`);
     return { message: `Cron job "${name}" added with schedule "${cronTime}"` };
   }
+  @Get('list-job')
+  list(){
+    this.taskService.listJob()
+    return {message:" cron job list"};
+  }
+
+  @Post('delete')
+  delete(
+    @Body() body: { name: string}
+  ){
+    const { name } = body;
+    this.taskService.deleteJob(name);
+    console.log("Cron Job deleted controller");
+  }
   @Roles(RoleEnum.USER)
   @UseGuards(JwtAuthGuard, RolesGuard)
   @Post('create')

@@ -19,6 +19,19 @@ export class TaskService{
       job.start();
       this.logger.log(`Dynamic Cron job ${name} added with schedule ${cronTime}`);
     }
+    
+    deleteJob(name:string){
+      this.schedulerRegistry.deleteCronJob(name);
+      this.logger.log('Cron Job "${name}" deleted');
+    }
+    listJob(){
+      const jobs = this.schedulerRegistry.getCronJobs();
+      jobs.forEach((job, name) => {
+        this.logger.log(`Cron "${job}," "${name}" is registered`);
+      });
+    }
+
+
   
     
 
