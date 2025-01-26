@@ -9,9 +9,12 @@ import { TaskModule } from '../task/task.module';
 import { RedisService } from 'src/redis/redis.service';
 import { TaskService } from 'src/task.service';
 import { ScheduleModule } from '@nestjs/schedule';
+import { QueueService } from 'src/queue/queue.service';
+import { QueueModule } from 'src/queue/queue.module';
 
 @Module({
   imports: [
+    QueueModule,
     ScheduleModule.forRoot(),
     TypeOrmModule.forFeature([Product, User]),
     UsersModule,

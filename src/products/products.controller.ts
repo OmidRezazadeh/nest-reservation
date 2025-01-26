@@ -24,6 +24,7 @@ import { DataSource, QueryRunner } from 'typeorm';
 import { RedisService } from '../redis/redis.service';
 import {  RedisKeys } from 'src/redis/redis-keys.constants';
 import { TaskService } from '../task.service';
+import { QueueService } from 'src/queue/queue.service';
 @Controller('products')
 export class ProductsController {
   constructor(
@@ -31,11 +32,17 @@ export class ProductsController {
     private readonly dataSource: DataSource,
     private readonly redisService: RedisService,
     @Inject(forwardRef(() => TaskService))
-    private readonly taskService: TaskService
+    private readonly taskService: TaskService,
+    private readonly queueService: QueueService
   ) {
 
     }
-
+@Post('add-queue')
+async addJob(){
+  const jobData = { example: 'data' };
+  await this.queueService.addJob(jobData);
+  return { message: 'Job added to the queue' };
+}
 
   @Post('add')
    add(

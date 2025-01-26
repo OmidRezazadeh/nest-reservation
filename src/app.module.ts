@@ -10,14 +10,23 @@ import { RedisModule } from './redis/redis.module';
 import { ScheduleModule } from '@nestjs/schedule';
 import { TaskModule } from './task/task.module';
 import { TaskService } from './task.service';
+import { BullModule } from '@nestjs/bullmq';
+import { QueueModule } from './queue/queue.module';
 
 
 @Module({
   imports: [
+    BullModule.forRoot({
+      connection: {
+        host: 'localhost',
+        port: 6379,
+      },
+    }),
+
     forwardRef(() => TaskModule),
     forwardRef(() => ProductsModule),
     ScheduleModule.forRoot(),
-    RedisModule,
+    // RedisModule,
     ConfigModule.forRoot({isGlobal: true}),
     TypeOrmModule.forRoot({
       type: 'postgres',
@@ -32,9 +41,9 @@ import { TaskService } from './task.service';
 
     UsersModule,
     ProductsModule,
-    AuthModule,
-    
+    AuthModule,  
     RedisModule,
+    QueueModule,
   ],
   providers:[TaskService],
   exports: [TaskService],
