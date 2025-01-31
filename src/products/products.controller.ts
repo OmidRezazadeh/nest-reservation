@@ -39,9 +39,13 @@ export class ProductsController {
     }
 @Post('add-queue')
 async addJob(){
-  const jobData = { example: 'data' };
+  const jobData = { example: 'test' };
   await this.queueService.addJob(jobData);
-  return { message: 'Job added to the queue' };
+  await this.queueService.addNotification(jobData)
+
+
+
+   return { message: 'Job added to the queue' };
 }
 
   @Post('add')

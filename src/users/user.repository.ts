@@ -2,6 +2,7 @@ import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { User } from './entities/user.entity';
+import { find } from 'rxjs';
 
 @Injectable()
 export class UserRepository {
@@ -25,4 +26,9 @@ export class UserRepository {
             where:{id:id}
      })
      }
+     
+     async find(){
+        return await this.repository.find();
+     }
+     
 }
