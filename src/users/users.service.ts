@@ -30,4 +30,7 @@ export class UsersService {
          return this.usersRepository.findOne(id)
 
     }
+    async find(){
+        return this.usersRepository.find();
+    }
 }

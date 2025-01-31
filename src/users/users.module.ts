@@ -5,10 +5,11 @@ import { UserRepository } from './user.repository';
 import { UsersService } from './users.service';
 import { UsersController } from './users.controller';
 import { UserSubscriber } from './subscribers/user-subscriber';
+import { DateService } from 'src/date/DateService';
 
 @Module({
     imports: [TypeOrmModule.forFeature([User])],
-    providers: [UserRepository, UsersService,UserSubscriber],
+    providers: [UserRepository, UsersService,UserSubscriber,DateService],
     exports: [UserRepository, UsersService],
     controllers: [UsersController]
 })
