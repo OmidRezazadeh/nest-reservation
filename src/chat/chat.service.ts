@@ -10,12 +10,11 @@ export class ChatService {
         @InjectRepository(ChatMessage)
         private readonly chatRepository: Repository<ChatMessage>,
       ) {}
-      async saveMessage(senderId, receiverId, message) {
+      async saveMessage(senderId, messageDto) {
         console
         const chatMessage = await this.chatRepository.save({
-          senderId: senderId,
-          receiverId: receiverId,
-          message: message
+          ...messageDto,
+          senderId,
         });
         console.log(chatMessage);
         return chatMessage;
