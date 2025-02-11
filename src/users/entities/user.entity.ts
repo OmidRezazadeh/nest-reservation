@@ -1,5 +1,6 @@
 import { Product } from 'src/products/entities/product.entity';
 import { RoleEnum } from 'src/roles/enums/roles.enums';
+import {ChatMessage} from "src/chat/chatMessage"
 import {
   Entity,
   Column,
@@ -32,6 +33,13 @@ export class User {
 
   @OneToMany(() => Product, (product) => product.user, { cascade: true })
   products: Product[];
+
+  @OneToMany(() => ChatMessage, (chatMessage) => chatMessage.senderId)
+  senderMessages: ChatMessage[];
+
+  @OneToMany(() => ChatMessage, (chatMessage) => chatMessage.receiverId)
+  receivedMessages: ChatMessage[];
+
 
   @CreateDateColumn()
   created_at: Date; // Automatically set when created
