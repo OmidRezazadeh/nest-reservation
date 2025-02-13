@@ -61,6 +61,7 @@ export class ChatGateway {
   }
 
   handleConnection(client: Socket) {
+   
     const headers = client.handshake.headers;
     console.log('Handshake headers:', headers);
 
@@ -73,7 +74,9 @@ export class ChatGateway {
     }
 
     try {
-      const decoded = this.jwtService.verify(token);
+      const decoded = this.jwtService.verify(token, {
+        secret: process.env.JWT_SECRET,
+      });
       const userId = decoded.userId; // Assuming userId is in the token payload
 
       if (userId) {
