@@ -22,26 +22,26 @@ export class ChatGateway {
 
   constructor(private readonly chatService: ChatService) {}
 
-  @UseGuards(WsJwtGuard) // Apply the guard to the entire gateway
+  @UseGuards(WsJwtGuard) 
   handleConnection(client: Socket) {
-    const userId = client.data.userId; // Access userId from client.data
+    const userId = client.data.userId; 
     if (userId) {
       client.join(`user_${userId}`);
       this.logger.log(`User ${userId} connected`);
     }
   }
 
-  @UseGuards(WsJwtGuard) // Apply the guard to this handler
+  @UseGuards(WsJwtGuard) 
   @SubscribeMessage('sendMessage')
   async handleMessage(
     @MessageBody() messageDto: MessageDto,
     @ConnectedSocket() client: Socket,
   ) {
-    const userId = client.data.userId; // Access userId from client.data
+    const userId = client.data.userId; 
 
     try {
       const message = await this.chatService.saveMessage(userId, messageDto);
-      this.server.emit('message', message); // Broadcast the message to all clients
+      this.server.emit('message', message); 
     } catch (error) {
       this.logger.error('Error saving message:', error.message);
       this.server
